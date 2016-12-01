@@ -33,6 +33,8 @@ impl Direction {
     }
 }
 
+const PART_1 : bool = true;
+
 fn main() {
     let mut cur_pos = Point { x: 0, y: 0 };
     let mut cur_dir = Direction::North;
@@ -58,7 +60,7 @@ fn main() {
                 Direction::West => cur_pos.x -= 1,
             }
 
-            if visited.contains(&cur_pos) {
+            if !PART_1 && visited.contains(&cur_pos) {
                 break 'outer;
             }
             visited.insert(cur_pos);
