@@ -1,0 +1,6 @@
+[package]
+name = "1_bunny_hq_dist"
+version = "0.1.0"
+authors = ["Blake Kaplan <mrbkap@gmail.com>"]
+
+[dependencies]
