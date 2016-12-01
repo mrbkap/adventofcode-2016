@@ -33,7 +33,7 @@ impl Direction {
     }
 }
 
-const PART_1 : bool = true;
+const PART_1 : bool = false;
 
 fn main() {
     let mut cur_pos = Point { x: 0, y: 0 };
