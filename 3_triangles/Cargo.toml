@@ -1,0 +1,6 @@
+[package]
+name = "3_triangles"
+version = "0.1.0"
+authors = ["Blake Kaplan <mrbkap@gmail.com>"]
+
+[dependencies]
