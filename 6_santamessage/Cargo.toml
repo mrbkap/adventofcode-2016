@@ -1,0 +1,6 @@
+[package]
+name = "6_santamessage"
+version = "0.1.0"
+authors = ["Blake Kaplan <mrbkap@gmail.com>"]
+
+[dependencies]
