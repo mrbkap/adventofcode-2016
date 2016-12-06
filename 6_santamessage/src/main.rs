@@ -5,7 +5,7 @@ use std::collections::HashMap;
 fn char_for_map(map: &HashMap<char, u32>) -> char {
     let mut vec : Vec<_> = map.iter().collect();
     vec.sort_by_key(|e| e.1);
-    *vec.last().unwrap().0
+    *vec.first().unwrap().0
 }
 
 fn main() {
