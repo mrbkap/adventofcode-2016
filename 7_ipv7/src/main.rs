@@ -1,10 +1,25 @@
 use std::io;
 use std::io::BufRead;
+use std::collections::HashMap;
 
-fn has_abba(l: &[u8]) -> bool {
-    for w in l.windows(4) {
-        if w[0] != w[1] && w[1] == w[2] && w[0] == w[3] {
-            return true;
+fn process_aba(l: &[u8], abas: &mut HashMap<[u8; 3], (bool, bool)>, negate: bool) -> bool {
+    for w in l.windows(3) {
+        if w[0] != w[1] && w[0] == w[2] {
+            if negate {
+                let bab = [w[1], w[0], w[1]];
+                let entry = abas.entry(bab).or_insert((false, true));
+                entry.1 = true;
+                if entry.0 && entry.1 {
+                    return true;
+                }
+            } else {
+                let aba = [w[0], w[1], w[2]];
+                let entry = abas.entry(aba).or_insert((true, false));
+                entry.0 = true;
+                if entry.0 && entry.1 {
+                    return true;
+                }
+            }
         }
     }
 
@@ -18,7 +33,7 @@ struct Splitter<'a> {
 }
 
 impl<'a> Splitter<'a> {
-    fn split(s: &'a [u8]) -> Splitter {
+    fn split(s: &'a [u8]) -> Splitter<'a> {
         Splitter { pos: 0, string: s, in_bracket: false }
     }
 }
@@ -50,20 +65,12 @@ fn main() {
     let stdin = io::stdin();
     let mut cnt = 0u32;
     'next: for line in stdin.lock().lines().filter_map(|l| l.ok()) {
-        let mut maybe_valid = false;
-        let bytes = line.as_bytes();
-        for (in_bracket, s) in Splitter::split(&bytes) {
-            if has_abba(s) {
-                if in_bracket {
-                    continue 'next;
-                }
-
-                maybe_valid = true;
+        let mut abas = HashMap::new();
+        for (in_bracket, s) in Splitter::split(&line.as_bytes()) {
+            if process_aba(&s, &mut abas, in_bracket) {
+                cnt += 1;
+                break;
             }
-        }
-
-        if maybe_valid {
-            cnt += 1;
         }
     }
     println!("{}", cnt);
