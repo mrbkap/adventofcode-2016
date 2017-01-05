@@ -75,7 +75,7 @@ impl CPU {
             panic!("executing empty program");
         }
 
-        let mut regs: Vec<i32> = vec![0, 0, 0, 0];
+        let mut regs: Vec<i32> = vec![0, 0, 1, 0];
         fn resolve_copysrc(s: &CopySource, regs: &[i32]) -> i32 {
             match *s {
                 CopySource::Imm(i) => i,
