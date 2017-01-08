@@ -1,7 +1,7 @@
 use std::collections::{ HashMap, VecDeque };
 
 const FAVORITE_NUM : usize = 1364;
-const TARGET : Point = Point { y: 39, x: 31 };
+//const TARGET : Point = Point { y: 39, x: 31 };
 
 #[derive(PartialEq, Eq, Hash, Clone)]
 struct Point {
@@ -49,8 +49,8 @@ impl Board {
         todo.push_back((Point::new(1, 1), 0));
         while !todo.is_empty() {
             let (cur_pt, cur_move) = todo.pop_front().unwrap();
-            if cur_pt == TARGET {
-                return cur_move;
+            if cur_move == 50 {
+                return self.visited.len();
             }
 
             self.push_succs(cur_pt, cur_move, &mut todo);
