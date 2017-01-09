@@ -69,7 +69,8 @@ fn main() {
                                    Disk::new(19, 2),
                                    Disk::new(5, 0),
                                    Disk::new(3, 0),
-                                   Disk::new(13, 5) ]);
+                                   Disk::new(13, 5),
+                                   Disk::new(11, 0) ]);
     let winner = find_answer(initial);
     println!("found {}", winner);
 }
