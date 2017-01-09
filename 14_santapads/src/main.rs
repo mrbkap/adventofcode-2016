@@ -6,6 +6,7 @@ use std::collections::VecDeque;
 
 fn main() {
     let buffer = "ahsbgdzn";
+    const NUM_ITERS : u32 = 2016;
 
     let mut generator = md5::Md5::new();
     let mut x = 0u64;
@@ -34,7 +35,15 @@ fn main() {
         generator.input_str(&buffer);
         generator.input_str(&x.to_string());
 
-        let result = generator.result_str();
+        let mut result = generator.result_str();
+        generator.reset();
+
+        for _ in 0..NUM_ITERS {
+            generator.input_str(&result);
+            result = generator.result_str();
+            generator.reset();
+        }
+
         let mut last_c = result.chars().next().unwrap();
         let mut cnt = 1;
         let mut found_triplet = false;
@@ -72,7 +81,6 @@ fn main() {
                 cnt = 1;
             }
         }
-        generator.reset();
         x += 1;
     }
 }
