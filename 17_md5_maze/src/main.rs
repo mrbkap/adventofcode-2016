@@ -57,15 +57,23 @@ impl Maze {
         exits
     }
 
-    fn solve(&mut self, passcode: &str) -> String {
+    fn solve(&mut self, passcode: &str) -> u32 {
         let mut visited: HashSet<Point> = HashSet::new();
         let mut work_list: VecDeque<Point> = VecDeque::new();
+        let mut max_len = 0usize;
         work_list.push_back(Point::new(0, 0, passcode));
 
         loop {
+            if work_list.is_empty() {
+                return max_len as u32;
+            }
+
             let cur_pos = work_list.pop_front().unwrap();
             if cur_pos.x == 3 && cur_pos.y == 3 {
-                return String::from(&cur_pos.path[passcode.len()..]);
+                if cur_pos.path.len() - passcode.len() > max_len {
+                    max_len = cur_pos.path.len() - passcode.len();
+                }
+                continue;
             }
 
             visited.insert(cur_pos.clone());
@@ -126,8 +134,8 @@ fn main() {
 fn do_tests() {
     let mut maze = Maze::new();
 
-    assert_eq!(maze.solve("ihgpwlah"), "DDRRRD");
-    assert_eq!(maze.solve("kglvqrro"), "DDUDRLRRUDRD");
-    assert_eq!(maze.solve("ulqzkmiv"), "DRURDRUDDLLDLUURRDULRLDUUDDDRR");
-    assert_eq!(maze.solve("vkjiggvb"), "RDRRULDDDR");
+    assert_eq!(maze.solve("ihgpwlah"), 370);
+    assert_eq!(maze.solve("kglvqrro"), 492);
+    assert_eq!(maze.solve("ulqzkmiv"), 830);
+    assert_eq!(maze.solve("vkjiggvb"), 392);
 }
