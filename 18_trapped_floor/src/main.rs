@@ -38,15 +38,13 @@ fn next_row(floor: &[u8]) -> Vec<u8> {
 
 fn main() {
     let input = ".^.^..^......^^^^^...^^^...^...^....^^.^...^.^^^^....^...^^.^^^...^^^^.^^.^.^^..^.^^^..^^^^^^.^^^..^";
-    println!("{}", input);
 
     let mut cur_row = parse_row(&input);
     let mut safe = count_safe(&cur_row);
 
-    for _ in 1..40 {
+    for _ in 1..400000 {
         cur_row = next_row(&cur_row);
         safe += count_safe(&cur_row);
-        println!("{}", row_to_printable(&cur_row));
     }
 
 
