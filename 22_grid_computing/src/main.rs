@@ -8,6 +8,7 @@ use std::io::{BufRead, BufReader};
 struct Node {
     x: usize,
     y: usize,
+    size: u32,
     avail: u32,
     used: u32,
 }
@@ -19,7 +20,7 @@ fn parse() -> Vec<Vec<Node>> {
         r"/dev/grid/node-x(\d+)-y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T\s+(\d+)%",
     ).unwrap();
     let mut first = true;
-    let mut rval: Vec<Vec<Node>> = (0..35).map(|_| Vec::with_capacity(26)).collect();
+    let mut rval: Vec<Vec<Node>> = (0..27).map(|_| Vec::with_capacity(36)).collect();
     for line in file.lines().filter_map(|l| l.ok()) {
         if first {
             // skip header line
@@ -30,14 +31,16 @@ fn parse() -> Vec<Vec<Node>> {
         let caps = re.captures(&line).unwrap();
         let x = caps[1].parse::<usize>().unwrap();
         let y = caps[2].parse::<usize>().unwrap();
+        let size = caps[3].parse::<u32>().unwrap();
         let used = caps[4].parse::<u32>().unwrap();
         let avail = caps[5].parse::<u32>().unwrap();
-        assert!(rval[x].len() == y);
-        rval[x].push(Node {
+        assert!(rval[y].len() == x);
+        rval[y].push(Node {
             x: x,
             y: y,
             avail: avail,
             used: used,
+            size: size,
         });
     }
 
@@ -54,4 +57,25 @@ fn main() {
         })
     });
     println!("{}", viable);
+
+    // part 2
+    for x in 0..nodes[0].len() + 1 {
+        print!("{:02} ", x);
+    }
+    println!("");
+    for (y, row) in nodes.iter().enumerate() {
+        print!("{:2}", y);
+        for (x, node) in row.iter().enumerate() {
+            if y == 0 && x == row.len() - 1 {
+                print!(" G ");
+            } else if node.used == 0 {
+                print!(" _ ");
+            } else if node.size > 100 {
+                print!(" # ");
+            } else {
+                print!(" . ");
+            }
+        }
+        println!("");
+    }
 }
