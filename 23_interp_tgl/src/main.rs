@@ -14,6 +14,7 @@ enum Isn {
     Cpy(RegOrImm, RegOrImm),
     Inc(RegOrImm),
     Dec(RegOrImm),
+    Mul(RegOrImm, RegOrImm, RegOrImm),
     Jnz(RegOrImm, RegOrImm),
     Tgl(RegOrImm),
 }
@@ -61,6 +62,12 @@ impl CPU {
                 let reg = parse_reg_or_imm(words[1]);
                 Isn::Dec(reg)
             }
+            "mul" => {
+                let left = parse_reg_or_imm(words[1]);
+                let right = parse_reg_or_imm(words[2]);
+                let dest = parse_reg_or_imm(words[3]);
+                Isn::Mul(left, right, dest)
+            }
             "jnz" => {
                 let source = parse_reg_or_imm(words[1]);
                 let dist = parse_reg_or_imm(words[2]);
@@ -70,7 +77,7 @@ impl CPU {
                 let target = parse_reg_or_imm(words[1]);
                 Isn::Tgl(target)
             }
-            _ => { panic!("bad keyword"); }
+            _ => { panic!("bad keyword {}", words[0]); }
         };
         self.isns.push(isn);
     }
@@ -80,7 +87,7 @@ impl CPU {
             panic!("executing empty program");
         }
 
-        let mut regs: Vec<i32> = vec![7, 0, 0, 0];
+        let mut regs: Vec<i32> = vec![12, 0, 0, 0];
         fn resolve_copysrc(s: &RegOrImm, regs: &[i32]) -> i32 {
             match *s {
                 RegOrImm::Imm(i) => i,
@@ -90,7 +97,6 @@ impl CPU {
 
         let mut pc = 0usize;
         loop {
-            println!("Regs: {:?} pc: {:?}", regs, pc);
             let (delta, change) = match self.isns[pc] {
                 Isn::Cpy(ref s, RegOrImm::Register(d)) => {
                     regs[d as usize] = resolve_copysrc(s, &regs);
@@ -102,6 +108,10 @@ impl CPU {
                 }
                 Isn::Dec(RegOrImm::Register(r)) => {
                     regs[r as usize] -= 1;
+                    (1, None)
+                }
+                Isn::Mul(ref left, ref right, RegOrImm::Register(dest)) => {
+                    regs[dest as usize] = resolve_copysrc(left, &regs) * resolve_copysrc(right, &regs);
                     (1, None)
                 }
                 Isn::Jnz(ref s, ref dest) => {
@@ -122,6 +132,7 @@ impl CPU {
                             &Isn::Inc(ref r) => Isn::Dec(r.clone()),
                             &Isn::Cpy(ref cs, ref dest) => Isn::Jnz(cs.clone(), dest.clone()),
                             &Isn::Jnz(ref cs, ref dest) => Isn::Cpy(cs.clone(), dest.clone()),
+                            &Isn::Mul(_, _, _) => panic!("uh oh"),
                         };
                         (1, Some(((ipc + target as isize) as usize, new_isn)))
                     } else {
