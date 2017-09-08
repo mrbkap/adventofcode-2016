@@ -1,6 +1,6 @@
 extern crate permutohedron;
 
-use std::collections::{VecDeque, HashSet};
+use std::collections::{HashSet, VecDeque};
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use permutohedron::LexicalPermutation;
@@ -17,7 +17,10 @@ impl Pos {
     }
 
     fn unew(x: usize, y: usize) -> Pos {
-        Pos { x: x as isize, y: y as isize }
+        Pos {
+            x: x as isize,
+            y: y as isize,
+        }
     }
 
     fn add(&self, p: &Pos) -> Option<Pos> {
@@ -31,7 +34,7 @@ impl Pos {
 }
 
 const DIRS: [Pos; 4] = [
-    Pos { x: -1, y:  0 },
+    Pos { x: -1, y: 0 },
     Pos { x: 0, y: -1 },
     Pos { x: 0, y: 1 },
     Pos { x: 1, y: 0 },
@@ -67,7 +70,7 @@ impl Maze {
             }
             maze.data.push(row);
         }
-        
+
         maze
     }
 
@@ -101,7 +104,9 @@ impl Maze {
 
 fn main() {
     let maze = Maze::parse("input.txt");
-    let mut weights = (0..maze.wires.len()).map(|_| vec![0; maze.wires.len()]).collect::<Vec<_>>();
+    let mut weights = (0..maze.wires.len())
+        .map(|_| vec![0; maze.wires.len()])
+        .collect::<Vec<_>>();
     for i in 0..maze.wires.len() {
         for j in (i + 1)..maze.wires.len() {
             let len = maze.len_between(i, j);
@@ -114,7 +119,8 @@ fn main() {
     let mut p = (0..weights.len()).collect::<Vec<_>>();
     loop {
         if p[0] == 0 {
-            let cur = (0..(p.len() - 1)).fold(0, |rr, c| rr + weights[p[c]][p[c + 1]]);
+            let cur = (0..(p.len() - 1)).fold(0, |rr, c| rr + weights[p[c]][p[c + 1]]) +
+                weights[*p.last().unwrap()][0];
             if cur < best {
                 best = cur;
             }
