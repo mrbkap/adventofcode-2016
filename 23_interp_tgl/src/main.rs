@@ -1,7 +1,8 @@
 use std::io::{BufRead, BufReader};
 use std::fs::File;
+use std::time::Instant;
 
-type Register = i32;
+type Register = usize;
 
 #[derive(Debug, Copy, Clone)]
 enum RegOrImm {
@@ -91,7 +92,7 @@ impl CPU {
         fn resolve_copysrc(s: &RegOrImm, regs: &[i32]) -> i32 {
             match *s {
                 RegOrImm::Imm(i) => i,
-                RegOrImm::Register(r) => regs[r as usize],
+                RegOrImm::Register(r) => regs[r],
             }
         }
 
@@ -99,19 +100,19 @@ impl CPU {
         loop {
             let (delta, change) = match self.isns[pc] {
                 Isn::Cpy(ref s, RegOrImm::Register(d)) => {
-                    regs[d as usize] = resolve_copysrc(s, &regs);
+                    regs[d] = resolve_copysrc(s, &regs);
                     (1, None)
                 }
                 Isn::Inc(RegOrImm::Register(r)) => {
-                    regs[r as usize] += 1;
+                    regs[r] += 1;
                     (1, None)
                 }
                 Isn::Dec(RegOrImm::Register(r)) => {
-                    regs[r as usize] -= 1;
+                    regs[r] -= 1;
                     (1, None)
                 }
                 Isn::Mul(ref left, ref right, RegOrImm::Register(dest)) => {
-                    regs[dest as usize] = resolve_copysrc(left, &regs) * resolve_copysrc(right, &regs);
+                    regs[dest] = resolve_copysrc(left, &regs) * resolve_copysrc(right, &regs);
                     (1, None)
                 }
                 Isn::Jnz(ref s, ref dest) => {
@@ -123,7 +124,7 @@ impl CPU {
                     }, None)
                 }
                 Isn::Tgl(RegOrImm::Register(targetreg)) => {
-                    let target = regs[targetreg as usize] as isize;
+                    let target = regs[targetreg] as isize;
                     let ipc = pc as isize;
                     if ipc + target >= 0 && ((ipc + target) as usize) < self.isns.len() {
                         let new_isn = match self.isns.get((ipc + target as isize) as usize).unwrap() {
@@ -160,10 +161,15 @@ fn main() {
     let input = File::open("input.txt").unwrap();
     let br = BufReader::new(input);
     let mut cpu = CPU::new();
+
+    let now = Instant::now();
+
     for l in br.lines().filter_map(|l| l.ok()) {
         cpu.parse_line(&l);
     }
 
+    let parsed = now.elapsed();
+
     let result = cpu.execute();
-    println!("Final result: {:?}", result);
+    println!("Final result: {:?} (parsing took {:?} total time was {:?}", result, parsed, now.elapsed());
 }
