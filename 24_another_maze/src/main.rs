@@ -116,14 +116,13 @@ fn main() {
     }
 
     let mut best = std::u32::MAX;
-    let mut p = (0..weights.len()).collect::<Vec<_>>();
+    let mut p = (1..weights.len()).collect::<Vec<_>>();
     loop {
-        if p[0] == 0 {
-            let cur = (0..(p.len() - 1)).fold(0, |rr, c| rr + weights[p[c]][p[c + 1]]) +
-                weights[*p.last().unwrap()][0];
-            if cur < best {
-                best = cur;
-            }
+        let cur = weights[0][p[0]] +
+                    (0..(p.len() - 1)).fold(0, |rr, c| rr + weights[p[c]][p[c + 1]]) +
+                    weights[*p.last().unwrap()][0];
+        if cur < best {
+            best = cur;
         }
 
         if !p.next_permutation() {
